@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Para Darleth</title>
+
+<style>
+:root{
+  --bg1:#050510;
+  --bg2:#12082b;
+  --accent:#ff3d81;
+  --accent2:#7c6cff;
+  --text:#ffffff;
+  --muted:rgba(255,255,255,.65);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background:
+    radial-gradient(800px 500px at 20% 20%, rgba(255,61,129,.25), transparent 60%),
+    radial-gradient(900px 600px at 80% 30%, rgba(124,108,255,.25), transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  color:var(--text);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* estrellas */
+.star{
+  position:absolute;
+  width:2px;height:2px;
+  background:white;
+  opacity:.6;
+  animation: twinkle 4s infinite ease-in-out;
+}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.8}}
+
+/* tarjeta */
+.card{
+  width:min(92vw,420px);
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:26px;
+  backdrop-filter: blur(16px);
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+  padding:24px;
+  text-align:center;
+  position:relative;
+  z-index:5;
+}
+
+h1{margin:10px 0;font-size:2rem;}
+p{color:var(--muted);font-size:1.1rem;margin:0 0 18px;}
+#msg{margin-top:14px;min-height:28px;font-weight:600}
+
+/* área botones */
+.btnArea{
+  position:relative;
+  width:100%;
+  padding:14px 10px 10px;
+  border-radius:18px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  overflow:hidden;
+}
+
+.track{
+  position:relative;
+  width:100%;
+  height:56px;
+}
+
+#yes{
+  position:absolute;
+  left:0;
+  top:0;
+  width:calc(50% - 6px);
+  height:56px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;
+  border:none;
+  border-radius:18px;
+  font-size:1.05rem;
+  font-weight:800;
+  cursor:pointer;
+}
+
+#no{
+  position:absolute;
+  left:calc(50% + 6px);
+  top:0;
+  width:calc(50% - 6px);
+  height:56px;
+  background:rgba(255,255,255,.12);
+  color:white;
+  border:none;
+  border-radius:18px;
+  font-size:1.05rem;
+  font-weight:800;
+  cursor:pointer;
+  transform-origin:center;
+  transition:transform .15s ease;
+}
+
+#yes:active,#no:active{transform:scale(.98)}
+
+/* 🌍 PLANETA TIERRA */
+.planet{
+  position:fixed;
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, #7dd3ff, #1e88e5 55%, #0d47a1 72%),
+    radial-gradient(circle at 62% 52%, rgba(76,175,80,.95) 0 22%, transparent 24%),
+    radial-gradient(circle at 42% 68%, rgba(102,187,106,.95) 0 16%, transparent 18%),
+    radial-gradient(circle at 52% 40%, rgba(129,199,132,.8) 0 10%, transparent 12%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.18) 0 22%, transparent 40%);
+  box-shadow:
+    inset -18px -22px 44px rgba(0,0,0,.38),
+    0 0 110px rgba(80,160,255,.55);
+  bottom:-220px;
+  left:50%;
+  transform:translateX(-50%);
+  transition:1s ease;
+  z-index:2;
+}
+
+/* temblor antes de explotar */
+.earthShake{
+  animation: earthShake .35s ease-in-out infinite;
+}
+@keyframes earthShake{
+  0%{ transform:translateX(-50%) translateY(0) }
+  25%{ transform:translateX(-50%) translateY(2px) }
+  50%{ transform:translateX(-50%) translateY(-2px) }
+  75%{ transform:translateX(-50%) translateY(1px) }
+  100%{ transform:translateX(-50%) translateY(0) }
+}
+
+.explosion{animation:explode 1.2s forwards;}
+@keyframes explode{
+  0%{transform:translateX(-50%) scale(1);opacity:1}
+  50%{transform:translateX(-50%) scale(2.5);opacity:1}
+  100%{transform:translateX(-50%) scale(5);opacity:0}
+}
+
+.final{animation:pop .4s ease-out;}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+.footer{margin-top:16px;font-size:.85rem;color:rgba(255,255,255,.5)}
+</style>
+</head>
+
+<body>
+
+<div class="planet" id="planet"></div>
+
+<div class="card" id="app">
+  <h1>Darleth</h1>
+  <p>amor… ¿quieres ser mi San Valentín?</p>
+
+  <div class="btnArea">
+    <div class="track" id="track">
+      <button id="yes">Sí</button>
+      <button id="no">No</button>
+    </div>
+  </div>
+
+  <div id="msg"></div>
+  <div class="footer">Hecho por Ariel</div>
+</div>
+
+<script>
+/* estrellas */
+for(let i=0;i<70;i++){
+  const s=document.createElement("div");
+  s.className="star";
+  s.style.left=Math.random()*100+"vw";
+  s.style.top=Math.random()*100+"vh";
+  s.style.animationDelay=Math.random()*4+"s";
+  document.body.appendChild(s);
+}
+
+/* FRASES EXACTAS que pediste */
+const phrases=[
+  "como que no sapa…",
+  "osea que no quieres…",
+  "ya asi vamos veras…",
+  "a pero si fuera otro…",
+  "ve sigue nomas sigue…",
+  "bueno veras…",
+  "no te aprentiras mi amor…",
+  "andale di que si…"
+];
+
+/* ADVERTENCIAS antes de la explosión */
+const warnings = [
+  "Mira que si no…",
+  "JUUUUUUM, ya no es broma…",
+  "Última oportunidad…",
+  "Si vuelves a decir que no, explota el planeta…"
+];
+
+let idx=0;
+let warningStage=0;
+let scale=1;
+
+const no=document.getElementById("no");
+const yes=document.getElementById("yes");
+const msg=document.getElementById("msg");
+const planet=document.getElementById("planet");
+const app=document.getElementById("app");
+const track=document.getElementById("track");
+
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+
+/* mover NO solo en su mitad derecha y sin tapar al SÍ */
+function moveNo(){
+  const tr=track.getBoundingClientRect();
+  const nr=no.getBoundingClientRect();
+  const pad=6;
+
+  const leftMin=tr.width/2+pad;
+  const leftMax=tr.width-nr.width-pad;
+  const topMin=0;
+  const topMax=tr.height-nr.height;
+
+  let x=leftMin+(Math.random()*2-1)*50; // rango pequeño X
+  let y=(Math.random()*2-1)*10;         // rango pequeño Y
+
+  x=clamp(x,leftMin,leftMax);
+  y=clamp(y,topMin,topMax);
+
+  no.style.left=x+"px";
+  no.style.top=y+"px";
+}
+
+function finalYes(){
+  app.innerHTML=`
+    <div class="final">
+      <h1>💖</h1>
+      <p>Decisión correctab sapa.</p>
+      <p>Darleth, este 14 es juntitos.</p>
+      <div class="footer">Hecho por Ariel</div>
+    </div>
+  `;
+}
+
+/* SÍ */
+yes.onclick=finalYes;
+
+/* NO */
+no.onclick=()=>{
+  moveNo();
+
+  // hacer el NO más chiquito cada vez
+  scale=Math.max(0.55,scale-0.06);
+  no.style.transform=`scale(${scale})`;
+
+  // frases iniciales
+  if(idx<phrases.length){
+    msg.textContent=phrases[idx];
+    idx++;
+    if(idx===phrases.length){
+      planet.style.bottom="20%"; // sale la Tierra
+    }
+    return;
+  }
+
+  // advertencias antes de explotar
+  if(warningStage < warnings.length){
+    msg.textContent = warnings[warningStage];
+    warningStage++;
+
+    // cuando está en la última advertencia, que tiemble el planeta
+    if (warningStage === warnings.length) {
+      planet.classList.add("earthShake");
+    }
+    return;
+  }
+
+  // 💥 EXPLOSIÓN FINAL
+  planet.classList.remove("earthShake");
+  planet.classList.add("explosion");
+
+  setTimeout(()=>{
+    app.innerHTML=`
+      <div class="final">
+        <h1>💥</h1>
+        <p>Explotó el planeta Tierra…</p>
+        <p>Aún puedes salvar el universo…</p>
+        <button id="save"
+          style="margin-top:14px;background:linear-gradient(135deg,#18c37e,#7c6cff);
+          color:white;border-radius:18px;padding:14px;border:none;font-weight:800;cursor:pointer;width:100%;">
+          Si quieres salvarlo sal conmigo (Sí voy a salir contigo mi vida hermosa porque yo te amo mucho y soy tu mujer y vamos a estar este 14 juntitos y vamos a comer muchas cosas y estar juntitos porque yo te amo mucho y no me voy a enojar porque no me respondes rápido porque se que me estas amando mucho "sapa como si no te amara, perdón por no pedírtelo de mejor forma pero te amo mucho y lo hago con todo el amor que tengo mi reyna hermosa…")
+        </button>
+        <div class="footer">Hecho por Ariel</div>
+      </div>
+    `;
+    document.getElementById("save").onclick=finalYes;
+  },1200);
+};
+</script>
+
+</body>
+</html>
